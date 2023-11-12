@@ -16,7 +16,7 @@ struct Sieve
     size::Int64
     bits::BitVector
 
-    Sieve(size::Int64) = new(size, trues(div2(size)))
+    Sieve(size::Int64) = new(size, trues(div2(size) - 1))
 end
 
 function run_sieve!(sieve::Sieve)
@@ -24,16 +24,17 @@ function run_sieve!(sieve::Sieve)
     q = ceil(Int64, sqrt(sieve.size))
 
     while factor < q
-        sieve.bits[(div2(factor * factor)+1):factor:div2(sieve.size)] .= false
-        factor = mul2(findnext(sieve.bits, div2(factor)+2)) - 1
+        @inbounds sieve.bits[(div2(factor * factor)):factor:end] .= false
+        index = findnext(sieve.bits, div2(factor) + 1)
+        factor = mul2(index) + 1
     end
 end
 
-count_primes(sieve::Sieve) = sum(sieve.bits)
+count_primes(sieve::Sieve) = sum(sieve.bits) + 1
 validate(sieve::Sieve) = haskey(validation_dict, sieve.size) && validation_dict[sieve.size] == count_primes(sieve)
 
 function printResults(sieve::Sieve, show_results::Bool, duration::Float64, passes::Int64)
-    show_results && println(join(replace([2i - 1 for (i, b) in enumerate(sieve.bits) if b], 1 => 2), ", "))
+    show_results && println(join(vcat([2], [2i - 1 for (i, b) in enumerate(sieve.bits) if b]), ", "))
     
     println("Passes: $passes, Time: $(duration)s, Avg: $(duration / passes)s, Limit: $(sieve.size), Count: $(count_primes(sieve)), Valid: $(validate(sieve))")
     println()
