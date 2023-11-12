@@ -25,12 +25,7 @@ function run_sieve!(sieve::Sieve)
 
     while factor < q
         sieve.bits[(div2(factor * factor)+1):factor:div2(sieve.size)] .= false
-        for index in (div2(factor)+2):div2(sieve.size)
-            if sieve.bits[index]
-                factor = mul2(index) - 1
-                break
-            end
-        end
+        factor = mul2(findnext(sieve.bits, div2(factor)+2)) - 1
     end
 end
 
