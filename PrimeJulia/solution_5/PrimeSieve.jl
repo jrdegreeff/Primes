@@ -18,15 +18,16 @@ end
 
 function run_sieve!(sieve::Sieve)
     sieve.bits[1] = false
+    sieve.bits[4:2:sieve.size] .= false
     
-    factor = 2
+    factor = 3
     q = ceil(Int64, sqrt(sieve.size))
 
     while factor < q
-        for num in (factor * factor):factor:sieve.size
+        for num in (factor * factor):2factor:sieve.size
             sieve.bits[num] = false
         end
-        for num in (factor+1):sieve.size
+        for num in (factor+2):2:sieve.size
             if sieve.bits[num]
                 factor = num
                 break
@@ -35,7 +36,7 @@ function run_sieve!(sieve::Sieve)
     end
 end
 
-count_primes(sieve::Sieve) = sieve.size >= 2 ? sum(sieve.bits) : 0
+count_primes(sieve::Sieve) = sum(sieve.bits)
 validate(sieve::Sieve) = haskey(validation_dict, sieve.size) && validation_dict[sieve.size] == count_primes(sieve)
 
 function printResults(sieve::Sieve, show_results::Bool, duration::Float64, passes::Int64)
