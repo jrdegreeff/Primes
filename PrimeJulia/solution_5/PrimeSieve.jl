@@ -24,9 +24,7 @@ function run_sieve!(sieve::Sieve)
     q = ceil(Int64, sqrt(sieve.size))
 
     while factor < q
-        for index in (div2(factor * factor)+1):factor:div2(sieve.size)
-            sieve.bits[index] = false
-        end
+        sieve.bits[(div2(factor * factor)+1):factor:div2(sieve.size)] .= false
         for index in (div2(factor)+2):div2(sieve.size)
             if sieve.bits[index]
                 factor = mul2(index) - 1
